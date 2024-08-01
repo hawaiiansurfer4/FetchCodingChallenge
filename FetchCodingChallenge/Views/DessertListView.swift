@@ -19,7 +19,9 @@ struct DessertListView: View {
                 }
             }
             .onAppear {
-                vm.fetchDessertData()
+                Task {
+                    await vm.fetchDessertData()
+                }
             }
         }
     }

@@ -11,24 +11,23 @@ class DessertViewModel: ObservableObject {
     var networkManager = NetworkManager()
     @Published var dessertArr = [Meal]()
     
-    func fetchDessertData() {
+    init() {
+        Task {
+            await fetchDessertData()
+        }
+    }
+    
+    func fetchDessertData() async{
         let startingURL = "https://themealdb.com/api/json/v1/1/filter.php?c=Dessert"
-        networkManager.fetchData(with: startingURL) { data, error in
-            if let _ = error {
-                print(error)
-            }
-            
+        do {
+            let data = try await networkManager.fetchData(with: startingURL)
             let decoder = JSONDecoder()
-            if let data = data {
-                do {
-                    let results = try decoder.decode(DessertModel.self, from: data)
-                    DispatchQueue.main.async {
-                        self.dessertArr = results.meals
-                    }
-                } catch {
-                    print(error)
-                }
+            let results = try decoder.decode(DessertModel.self, from: data)
+            DispatchQueue.main.async {
+                self.dessertArr = results.meals
             }
+        } catch {
+            print(error)
         }
     }
 }
